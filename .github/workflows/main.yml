@@ -6,17 +6,26 @@ on:
       - main
 jobs:
   build-and-push:
+    permissions:
+      id-token: write # Require write permission to Fetch an OIDC token.
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Log in to Azure Container Registry
-        uses: azure/docker-login@v1
+      - name: Azure CLI Login
+        uses: azure/login@v2
         with:
-          login-server: ${{ secrets.ACR_LOGIN_SERVER }}
-          username: ${{ secrets.ACR_USERNAME }}
-          password: ${{ secrets.ACR_PASSWORD }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      # - name: Log in to Azure Container Registry
+      #   uses: docker/login-action@v4
+      #   with:
+      #     login-server: ${{ secrets.ACR_LOGIN_SERVER }}
+      #     username: ${{ secrets.ACR_USERNAME }}
+      #     password: ${{ secrets.ACR_PASSWORD }}
           
       - name: Generate buildnumber based on date and time
         id: buildnumber
