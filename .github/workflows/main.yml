@@ -1,1 +1,28 @@
+# Github Workflow that reacts on trigger to main branch, then builds the docker image and pushes it to Azure Container Registry
+name: Build and Push Docker Image to ACR
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
+      - name: Log in to Azure Container Registry
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ secrets.ACR_LOGIN_SERVER }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+          
+      - name: Generate buildnumber based on date and time
+        id: buildnumber
+        run: echo "BUILD_NUMBER=$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/birthday-frontend:${{ env.BUILD_NUMBER }} .
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/birthday-frontend:${{ env.BUILD_NUMBER }}
