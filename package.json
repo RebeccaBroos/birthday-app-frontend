@@ -1,0 +1,20 @@
+{
+  "name": "birthday-app-frontend",
+  "version": "1.0.0",
+  "description": "Frontend tier for birthday-app - web form for user registration",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "birthday",
+    "registration",
+    "form"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
