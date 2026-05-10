@@ -33,6 +33,6 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          az acr login --name ${{ secrets.ACR_LOGIN_SERVER }}
+          az acr login --name $(echo ${{ secrets.ACR_LOGIN_SERVER }} | cut -d. -f1)
           docker build -t ${{ secrets.ACR_LOGIN_SERVER }}/birthday-frontend:${{ env.BUILD_NUMBER }} .
           docker push ${{ secrets.ACR_LOGIN_SERVER }}/birthday-frontend:${{ env.BUILD_NUMBER }}
