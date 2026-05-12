@@ -9,9 +9,20 @@ const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5000';
 app.use(express.static('public'));
 app.use(express.json());
 
-// Serve the main HTML file
+// Serve the main HTML file with backend URL injected
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    const indexPath = path.join(__dirname, 'public', 'index.html');
+    res.sendFile(indexPath, (err) => {
+        if (err) {
+            console.error('Error sending file:', err);
+            res.status(500).send('Error loading page');
+        }
+    });
+});
+
+// Serve configuration for frontend
+app.get('/config', (req, res) => {
+    res.json({ backendUrl: BACKEND_URL });
 });
 
 // Health check endpoint

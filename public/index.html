@@ -247,9 +247,21 @@
     </div>
 
     <script>
-        // Backend API endpoint - can be configured via environment or update here
-        const BACKEND_API = 'http://localhost:5000/submit';
-        const HELLO_API = 'http://localhost:5000/hello';
+        // Fetch backend URL from server configuration
+        let BACKEND_API = 'http://localhost:5000/submit';
+        let HELLO_API = 'http://localhost:5000/hello';
+
+        // Load configuration from server
+        fetch('/config')
+            .then(response => response.json())
+            .then(config => {
+                BACKEND_API = `${config.backendUrl}/submit`;
+                HELLO_API = `${config.backendUrl}/hello`;
+                console.log('Backend URL loaded:', config.backendUrl);
+            })
+            .catch(error => {
+                console.warn('Could not load config, using defaults:', error);
+            });
 
         const form = document.getElementById('registrationForm');
         const messageDiv = document.getElementById('message');
