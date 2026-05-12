@@ -173,6 +173,26 @@
             font-size: 40px;
             margin-bottom: 10px;
         }
+
+        .button-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .button-container button {
+            flex: 1;
+            margin-top: 0;
+        }
+
+        button.hello-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        button.hello-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
     </style>
 </head>
 <body>
@@ -219,16 +239,22 @@
             <button type="submit" id="submitBtn">Submit</button>
         </form>
 
+        <div class="button-container">
+            <button type="button" id="helloBtn" class="hello-btn">Say Hello</button>
+        </div>
+
         <div id="message" class="message"></div>
     </div>
 
     <script>
         // Backend API endpoint - can be configured via environment or update here
         const BACKEND_API = 'http://localhost:5000/submit';
+        const HELLO_API = 'http://localhost:5000/hello';
 
         const form = document.getElementById('registrationForm');
         const messageDiv = document.getElementById('message');
         const submitBtn = document.getElementById('submitBtn');
+        const helloBtn = document.getElementById('helloBtn');
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -287,6 +313,54 @@
                 messageDiv.innerHTML = '<strong>Error:</strong><br>Failed to reach the backend service. Make sure the backend is running at ' + BACKEND_API;
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = 'Submit';
+            }
+        });
+
+        // Hello button event listener
+        helloBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+
+            // Clear previous messages
+            messageDiv.className = 'message';
+            messageDiv.textContent = '';
+
+            // Disable button and show loading state
+            helloBtn.disabled = true;
+            helloBtn.innerHTML = '<span class="spinner"></span>Sending...';
+
+            try {
+                // Send hello request to backend
+                const response = await fetch(HELLO_API, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: 'hello'
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.message) {
+                    // Success response
+                    messageDiv.className = 'message info';
+                    messageDiv.innerHTML = `<strong>Backend Response:</strong><br>${data.message}`;
+                } else {
+                    // Unexpected response format
+                    messageDiv.className = 'message error';
+                    messageDiv.innerHTML = '<strong>Error:</strong><br>Unexpected response from backend';
+                }
+                
+                helloBtn.disabled = false;
+                helloBtn.innerHTML = 'Say Hello';
+            } catch (error) {
+                // Network or parsing error
+                console.error('Error:', error);
+                messageDiv.className = 'message error';
+                messageDiv.innerHTML = '<strong>Error:</strong><br>Backend server did not respond. Make sure the backend is running.';
+                helloBtn.disabled = false;
+                helloBtn.innerHTML = 'Say Hello';
             }
         });
 
